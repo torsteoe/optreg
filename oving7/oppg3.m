@@ -40,21 +40,20 @@ B1 = kron(eye(N), -B);
 Aeq = [A1 B1];
 
 Beq = zeros(N*mx, 1);
-Beq(1:mx) = A*x0;
+Beq(1:mx) = A*x0_hat;
 
 G = eye(N*(mx+mu));
 
 G(1:N*mx, 1:N*mx) = kron(eye(N), Q);
 G(N*mx+1:N*mx+N*mu, N*mx+1:N*mx+N*mu) = kron(eye(N), R);
 
-z0 = zeros(N*(mx+mu), 1);
-z0(1:mx) = x0;
+
 LB = -Inf*ones(N*(mx+mu),1);
 LB(N*mx+1:N*(mx+mu)) = -4;
 UB = -LB;
 
 options = optimset('Display', 'off', 'Diagnostics', 'Off', 'LargeScale', 'Off', 'Algorithm', 'interior-point-convex');
-z = quadprog(G, [], [],[], Aeq, Beq, LB, UB, x0_hat);
+z = quadprog(G, [], [],[], Aeq, Beq, LB, UB);
 
 
 x_optimal_1 = z(1:2:N*mx);
@@ -75,13 +74,13 @@ xs = zeros(N, 2);
 xs_est = zeros(N, 2);
 
 current_Beq = zeros(N*mx, 1);
-current_Beq(1:mx) = A*x0;
+current_Beq(1:mx) = A*x0_hat;
 for k = 1:50
     xs(k,:) = current_state;
     xs_est(k,:) = current_state_est;
-    if mod(k, 5) == 0 
+    if mod(k, 1) == 0 
         current_Beq(1:mx) = A*current_state_est;
-        z = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est, options);
+        [z,fval,exitflag,output,lambda] = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est,[], options);
         current_input = z(N*mx+1);
     end
      y = c*current_state;
