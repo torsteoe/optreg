@@ -25,12 +25,13 @@ num_states_same_input = 3*5;
 mu = 3;
 
 b1(1:mu) = b;
-b1(mu+1:mu+mu) = b;
-b1(mu*2+1:mu*2+2*mu) = [b;b];
-b1(mu*4+1:mu*4+4*mu) = kron(ones(4,1), b);
-b1(mu*8+1:mu*8+8*mu) = kron(ones(8,1), b);
-b1(mu*16+1:mu*16+14*mu) = kron(ones(14,1), b);
+b1(mu+1:mu+mu,2) = b;
+b1(mu*2+1:mu*2+2*mu,3) = [b;b];
+b1(mu*4+1:mu*4+4*mu,4) = kron(ones(4,1), b);
+b1(mu*8+1:mu*8+8*mu,5) = kron(ones(8,1), b);
+b1(mu*16+1:mu*16+14*mu,6) = kron(ones(14,1), b);
 a1(1:3, 1:3) = eye(3);
+
 for k = 2:N
     a1((k*3-2):(k*3-2+2), (k*3-2):(k*3-2+2)) = eye(3);
     a1((3*k-2):((3*k-2)+2), (3*k-5):(3*k-5)+2) = -A;

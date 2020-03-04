@@ -14,9 +14,9 @@ b = [1;0;0.1];
 x_0 = [0;0;1];
 blocks = 6;
 
-q = diag_repeat(Q, N);
-p = diag_repeat(R*5, blocks);
-G = blkdiag(q,p);
+q_open_loop = diag_repeat(Q, N);
+p_open_loop = diag_repeat(R*5, blocks);
+G = blkdiag(q_open_loop,p);
 c = zeros(120,1);
 
 a1 = zeros(N*3, N*3);
