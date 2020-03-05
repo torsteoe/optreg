@@ -1,0 +1,763 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>oppg3</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-05"><meta name="DC.source" content="oppg3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">clear
+close <span class="string">all</span>
+clc
+Q = eye(2)*4;
+R = eye(1);
+
+k1 = 1;
+k2 = 1;
+k3 = 1;
+T = 0.1;
+
+A = [1 T;
+    -k2*T 1-k1*T];
+
+B = [0;k3*T];
+x0 = [5;1];
+x0_hat = [6;0];
+c = [1 0];
+
+
+mx = 2;
+mu = 1;
+N = 10;
+
+<span class="comment">%Make Aeq</span>
+
+A1 = eye(N*mx);
+
+<span class="keyword">for</span> k=1:N-1
+    A1(k*mx+1:k*mx+mx,k*mx-1:k*mx) = -A;
+<span class="keyword">end</span>
+
+B1 = kron(eye(N), -B);
+Aeq = [A1 B1];
+
+Beq = zeros(N*mx, 1);
+Beq(1:mx) = A*x0_hat;
+
+G = eye(N*(mx+mu));
+
+G(1:N*mx, 1:N*mx) = kron(eye(N), Q);
+G(N*mx+1:N*mx+N*mu, N*mx+1:N*mx+N*mu) = kron(eye(N), R);
+
+LB = -Inf*ones(N*(mx+mu),1);
+LB(N*mx+1:N*(mx+mu)) = -4;
+UB = -LB;
+
+options = optimset(<span class="string">'Display'</span>, <span class="string">'off'</span>, <span class="string">'Diagnostics'</span>, <span class="string">'Off'</span>, <span class="string">'LargeScale'</span>, <span class="string">'Off'</span>, <span class="string">'Algorithm'</span>, <span class="string">'interior-point-convex'</span>);
+z = quadprog(G, [], [],[], Aeq, Beq, LB, UB);
+
+<span class="comment">% x_optimal_1 = z(1:2:N*mx);</span>
+<span class="comment">% x_optimal_2 = z(2:2:N*mx);</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%  plot(t, x_optimal_1, '-black');</span>
+<span class="comment">%  hold on;</span>
+<span class="comment">%  plot(t, x_optimal_2, '-black');</span>
+<span class="comment">%  hold on;</span>
+poles = [0.5 + 0.03j; 0.5-0.03j];
+
+
+Kf = place(A', c.', poles);
+
+current_state = x0;
+current_state_est = x0_hat;
+current_input = 0;
+xs = zeros(N, 2);
+xs_est = zeros(N, 2);
+
+current_Beq = zeros(N*mx, 1);
+current_Beq(1:mx) = A*x0_hat;
+timesteps = 50;
+<span class="keyword">for</span> k = 1:timesteps
+    xs(k,:) = current_state;
+    xs_est(k,:) = current_state_est;
+    y = c*current_state;
+
+    y_hat = c*current_state_est;
+    current_Beq(1:mx) = A*current_state_est;
+    [z,fval,exitflag,output,lambda] = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est,[], options);
+    current_input = z(N*mx+1);
+
+
+     current_state_est = (A)*(current_state_est) + B*current_input +Kf.'*(y-y_hat);
+     current_state = (A)*current_state + B*current_input;
+
+
+<span class="keyword">end</span>
+
+
+
+ t =1:timesteps;
+plot(t, xs(:,1), <span class="string">'-black'</span>);
+hold <span class="string">on</span>;
+plot(t, xs(:,2), <span class="string">'-black'</span>);
+hold <span class="string">on</span>;
+plot(t, xs_est(:,1), <span class="string">'-blue'</span>);
+hold <span class="string">on</span>;
+plot(t, xs_est(:,2), <span class="string">'-blue'</span>);
+
+
+
+
+
+<span class="comment">%</span>
+<span class="comment">% t = [1:51];</span>
+<span class="comment">% figure(1);</span>
+<span class="comment">% plot(t, x(:,1), '-black');</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% plot(t, x(:,2), '-black');</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% plot(t, x_est(:,1), '-blue');</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% plot(t, x_est(:,2), '-blue');</span>
+</pre><pre class="codeoutput">
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+The interior-point-convex algorithm does not accept an initial point.
+Ignoring X0.
+
+Minimum found that satisfies the constraints.
+
+Optimization completed because the objective function is non-decreasing in 
+feasible directions, to within the value of the optimality tolerance,
+and constraints are satisfied to within the value of the constraint tolerance.
+
+</pre><img vspace="5" hspace="5" src="oppg3_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+
+clear
+close all
+clc
+Q = eye(2)*4;
+R = eye(1);
+
+k1 = 1;
+k2 = 1;
+k3 = 1;
+T = 0.1;
+
+A = [1 T;
+    -k2*T 1-k1*T];
+
+B = [0;k3*T];
+x0 = [5;1];
+x0_hat = [6;0];
+c = [1 0];
+
+
+mx = 2;
+mu = 1;
+N = 10;
+
+%Make Aeq
+
+A1 = eye(N*mx);
+
+for k=1:N-1
+    A1(k*mx+1:k*mx+mx,k*mx-1:k*mx) = -A;
+end
+
+B1 = kron(eye(N), -B);
+Aeq = [A1 B1];
+
+Beq = zeros(N*mx, 1);
+Beq(1:mx) = A*x0_hat;
+
+G = eye(N*(mx+mu));
+
+G(1:N*mx, 1:N*mx) = kron(eye(N), Q);
+G(N*mx+1:N*mx+N*mu, N*mx+1:N*mx+N*mu) = kron(eye(N), R);
+
+LB = -Inf*ones(N*(mx+mu),1);
+LB(N*mx+1:N*(mx+mu)) = -4;
+UB = -LB;
+
+options = optimset('Display', 'off', 'Diagnostics', 'Off', 'LargeScale', 'Off', 'Algorithm', 'interior-point-convex');
+z = quadprog(G, [], [],[], Aeq, Beq, LB, UB);
+
+% x_optimal_1 = z(1:2:N*mx);
+% x_optimal_2 = z(2:2:N*mx);
+% 
+% 
+%  plot(t, x_optimal_1, '-black');
+%  hold on;
+%  plot(t, x_optimal_2, '-black');
+%  hold on;
+poles = [0.5 + 0.03j; 0.5-0.03j];
+
+
+Kf = place(A', c.', poles);
+
+current_state = x0;
+current_state_est = x0_hat;
+current_input = 0;
+xs = zeros(N, 2);
+xs_est = zeros(N, 2);
+
+current_Beq = zeros(N*mx, 1);
+current_Beq(1:mx) = A*x0_hat;
+timesteps = 50;
+for k = 1:timesteps
+    xs(k,:) = current_state;
+    xs_est(k,:) = current_state_est;
+    y = c*current_state;
+     
+    y_hat = c*current_state_est;
+    current_Beq(1:mx) = A*current_state_est;
+    [z,fval,exitflag,output,lambda] = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est,[], options);
+    current_input = z(N*mx+1);
+ 
+
+     current_state_est = (A)*(current_state_est) + B*current_input +Kf.'*(y-y_hat);
+     current_state = (A)*current_state + B*current_input;
+
+    
+end
+
+
+
+ t =1:timesteps;
+plot(t, xs(:,1), '-black');
+hold on;
+plot(t, xs(:,2), '-black');
+hold on;
+plot(t, xs_est(:,1), '-blue');
+hold on;
+plot(t, xs_est(:,2), '-blue');
+
+
+
+
+
+% 
+% t = [1:51];
+% figure(1);
+% plot(t, x(:,1), '-black');
+% hold on;
+% plot(t, x(:,2), '-black');
+% hold on;
+% plot(t, x_est(:,1), '-blue');
+% hold on;
+% plot(t, x_est(:,2), '-blue');
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

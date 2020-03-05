@@ -16,7 +16,8 @@ A = [1 T;
 B = [0;k3*T];
 x0 = [5;1];
 x0_hat = [6;0];
-c = [1 0];
+c = eye(2);
+[K, P, eigenvalues] = dlqr(A, B, Q, R);
 
 
 mx = 2;
@@ -41,6 +42,8 @@ G = eye(N*(mx+mu));
 
 G(1:N*mx, 1:N*mx) = kron(eye(N), Q);
 G(N*mx+1:N*mx+N*mu, N*mx+1:N*mx+N*mu) = kron(eye(N), R);
+G((N-1)*(mx):N*mx-1, (N-1)*mx:N*mx-1) = G((N-1)*(mx):N*mx-1, (N-1)*mx:N*mx) + P;
+
 
 LB = -Inf*ones(N*(mx+mu),1);
 LB(N*mx+1:N*(mx+mu)) = -4;
@@ -77,10 +80,11 @@ for k = 1:timesteps
     y = c*current_state;
      
     y_hat = c*current_state_est;
-    current_Beq(1:mx) = A*current_state_est;
-    [z,fval,exitflag,output,lambda] = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est,[], options);
-    current_input = z(N*mx+1);
- 
+    if mod(k, 5) == 1 
+        current_Beq(1:mx) = A*current_state_est;
+        [z,fval,exitflag,output,lambda] = quadprog(G, [], [],[], Aeq, current_Beq, LB, UB, current_state_est,[], options);
+        current_input = z(N*mx+1);
+    end
 
      current_state_est = (A)*(current_state_est) + B*current_input +Kf.'*(y-y_hat);
      current_state = (A)*current_state + B*current_input;
