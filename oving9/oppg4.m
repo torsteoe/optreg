@@ -4,21 +4,21 @@ clear;
 clc;
 x0 = [-2;2];
 f1 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[-2,2]');
 x0 = [-1.2; 1];
 f2 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[-1.2, 1]');
 
 x0 = [5;5];
 f3 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[5,5]');
 
 x0 = [1;1];
 f4 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[1,1]');
 
 movegui(f1,'west');
@@ -29,7 +29,7 @@ movegui(f4,'south');
 %% 1c
 x0 = [1.2;1.2];
 f1 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[1.2,1.2]');
 f2 = figure();
 plot_iter_rosenbrock(iter);
@@ -37,7 +37,7 @@ legend('[1.2,1.2]');
 
 x0 = [-1.2; 1];
 f3 = figure();
-[x, fval, iter] = nelder_mead(x0, 'report');
+[x, fval, iter] = nelder_mead(x0, ' ');
 legend('[-1.2, 1]');
 
 

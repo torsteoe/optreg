@@ -95,7 +95,7 @@ while norm(grad_value_k,2) > epsilon
     if k == 30
         break;
     end
-    k
+    k;
 end
 disp(k);
 
