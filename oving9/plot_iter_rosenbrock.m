@@ -11,7 +11,7 @@ function plot_iter_rosenbrock(x_iter)
     f = 100*(x2-x1.^2).^2 + (1-x1).^2;
     levels = (0:5:50)';
     
-    figure(1);
+
     clf;
     hold('on');
     box('on');

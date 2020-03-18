@@ -1,0 +1,23 @@
+%% Testing Nelder Mead
+close all;
+clear;
+clc;
+x0 = [-2;2];
+f1 = figure();
+[x, fval, iter] = nelder_mead(x0, 'report');
+legend('[-2,]');
+x0 = [-1.2, 1];
+f2 = figure();
+[x, fval, iter] = nelder_mead(x0, 'report');
+legend('[-1.2, 1]');
+
+x0 = [-1.2, 1];
+f3 = figure();
+[x, fval, iter] = nelder_mead(x0, 'report');
+x0 = [-1.2, 1];
+f4 = figure();
+[x, fval, iter] = nelder_mead(x0, 'report');
+movegui(f1,'west');
+movegui(f2,'north');
+movegui(f3,'east');
+movegui(f4,'south');

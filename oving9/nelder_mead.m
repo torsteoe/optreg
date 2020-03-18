@@ -213,7 +213,6 @@ function report(k, x1, f_x1, action)
 end
 
 function plot_f(f_avg_iter)
-    figure(1);
     plot(f_avg_iter);
     axis('tight');
     grid('on');
